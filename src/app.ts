@@ -25,4 +25,16 @@ app.get("/", async (request, reply) => {
   return { hello: "world" };
 });
 
+app.setErrorHandler(function (error, request, reply) {
+  if ("validation" in error && Array.isArray((error as any).validation)) {
+    const validationErrors = (error as any).validation;
+    const errors = validationErrors.map((err: any) => {
+      return {
+        message: err.message,
+      };
+    });
+    return reply.status(400).send({ errors });
+  }
+  throw error;
+});
 export default app;
